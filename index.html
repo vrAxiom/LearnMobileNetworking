@@ -86,7 +86,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .concept-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .concept-desc{font-size:12px;color:var(--muted);line-height:1.6}
 .terms-row{display:flex;flex-wrap:wrap;gap:7px}
-.term-chip{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:20px;background:var(--bg3);border:1.5px solid var(--border);color:var(--muted);font-weight:700}
+.term-chip{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:20px;background:var(--bg3);border:1.5px solid var(--border);color:var(--muted);font-weight:700;cursor:pointer;transition:color .2s,border-color .2s,background .2s,transform .15s}
+.term-chip:hover,.term-chip:focus{color:var(--a1);border-color:var(--a1);background:#eff6ff;transform:translateY(-1px);outline:none}
 
 .diagram-container{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:20px;overflow-x:auto;margin-top:16px}
 .diagram-title{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;font-weight:700}
@@ -120,12 +121,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
 .gloss-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;transition:box-shadow .2s}
 .gloss-card:hover{box-shadow:0 2px 8px rgba(37,99,235,0.07)}
+.gloss-card.highlight{border-color:var(--a1);box-shadow:0 0 0 3px rgba(37,99,235,0.12),0 4px 16px rgba(37,99,235,0.12)}
 .gloss-term{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--a1);margin-bottom:6px}
 .gloss-def{font-size:12px;color:var(--muted);line-height:1.65}
 .gloss-ch{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px;font-weight:700}
+.gloss-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
 .gloss-search{width:100%;max-width:380px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:10px 15px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:20px}
+.gloss-toolbar .gloss-search{margin-bottom:0}
 .gloss-search:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
 .gloss-search::placeholder{color:var(--faint)}
+.gloss-back{display:none;font-family:var(--mono);font-size:11px;color:#fff;background:var(--a1);border:1.5px solid var(--a1);border-radius:8px;padding:9px 14px;cursor:pointer;white-space:nowrap;font-weight:700;transition:background .2s,border-color .2s}
+.gloss-back.visible{display:inline-flex}
+.gloss-back:hover{background:#1d4ed8;border-color:#1d4ed8}
 
 .path-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;transition:border-color .2s,box-shadow .2s,transform .15s;cursor:pointer}.path-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(37,99,235,0.09);transform:translateY(-2px)}
 .path-card:hover::before{opacity:1}
@@ -213,7 +220,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 <div id="glossary-section" style="display:none">
   <div class="section">
     <div class="section-title">Glossary &#8212; 50+ Key Terms</div>
-    <input type="text" class="gloss-search" placeholder="Search terms&#8230; e.g. VoLTE, GTP, eNodeB, DASH" oninput="filterGlossary(this.value)">
+    <div class="gloss-toolbar">
+      <button class="gloss-back" id="gloss-back" onclick="returnFromGlossary()">Back to chapter</button>
+      <input type="text" class="gloss-search" id="gloss-search" placeholder="Search terms&#8230; e.g. VoLTE, GTP, eNodeB, DASH" oninput="filterGlossary(this.value)">
+    </div>
     <div class="gloss-grid" id="gloss-grid"></div>
   </div>
 </div>
@@ -601,6 +611,27 @@ const glossaryTerms=[
 {t:'X2 Interface',d:'Direct 4G eNodeB-to-eNodeB link for coordinated handover without the core network.',ch:'Ch 7'},
 {t:'Xn Interface',d:'Direct 5G gNB-to-gNB link — 5G equivalent of X2 for fast coordinated handover.',ch:'Ch 7'},
 {t:'Measurement Report',d:'UE signal quality reports sent to the serving base station to trigger handover decisions.',ch:'Ch 7'},
+{t:'HSPA',d:'High Speed Packet Access - 3G upgrade that increased mobile broadband speeds beyond original UMTS.',ch:'Ch 1'},
+{t:'NodeB',d:'3G UMTS base station. It connects UE radio traffic into the 3G RAN and is managed by the RNC.',ch:'Ch 2'},
+{t:'SGSN',d:'Serving GPRS Support Node - 2G/3G packet-core node that tracks mobility and routes packet data.',ch:'Ch 2'},
+{t:'GGSN',d:'Gateway GPRS Support Node - 2G/3G gateway between mobile packet data networks and external IP networks.',ch:'Ch 2'},
+{t:'QoS',d:'Quality of Service - network rules that prioritize latency-sensitive traffic such as voice or control signals.',ch:'Ch 3 / Ch 6'},
+{t:'IP Header Compression',d:'Reducing repeated IP header bytes before radio transmission, improving efficiency on constrained air links.',ch:'Ch 3'},
+{t:'Packet',d:'A small unit of data with headers and payload that can be routed independently through packet networks.',ch:'Ch 3'},
+{t:'Circuit Switched',d:'Legacy voice method that reserves a dedicated end-to-end circuit for the whole call.',ch:'Ch 4'},
+{t:'Packet Switched',d:'Data method where traffic is split into packets and routed over shared network resources.',ch:'Ch 4'},
+{t:'SIP',d:'Session Initiation Protocol - signaling protocol IMS uses to set up, modify, and end voice sessions.',ch:'Ch 4'},
+{t:'HD Voice',d:'Wideband voice coding that carries more audio detail than narrowband circuit voice.',ch:'Ch 4'},
+{t:'CDN',d:'Content Delivery Network - distributed servers that cache content closer to users to reduce delay and backbone traffic.',ch:'Ch 5'},
+{t:'ABR',d:'Adaptive Bitrate streaming - switching video quality up or down based on real-time bandwidth and buffer health.',ch:'Ch 5'},
+{t:'Google Global Cache',d:'Google edge cache platform often hosted inside operator networks to serve YouTube and other Google content locally.',ch:'Ch 5'},
+{t:'Latency',d:'End-to-end delay between sending data and receiving a response. Lower latency improves calls, gaming, and streaming startup.',ch:'Ch 5'},
+{t:'Bearer',d:'A logical 4G data pipe with assigned QoS treatment between the UE and packet core.',ch:'Ch 6'},
+{t:'Flow',d:'A set of related packets that can receive its own 5G QoS treatment within a PDU session.',ch:'Ch 6'},
+{t:'SLA',d:'Service Level Agreement - promised network performance targets such as latency, bandwidth, or reliability.',ch:'Ch 6'},
+{t:'Bandwidth',d:'Available data-carrying capacity of a link, commonly measured in Mbps or Gbps.',ch:'Ch 6'},
+{t:'Beam Management',d:'5G process for finding, tracking, and switching directional radio beams as the UE moves.',ch:'Ch 7'},
+{t:'Break-Before-Make',d:'Hard handover style where the old radio link is released before the new one is established.',ch:'Ch 7'},
 ];
 
 function renderChapterCards(){
@@ -614,6 +645,9 @@ document.getElementById('chapter-grid').innerHTML=chapters.map(ch=>`
 }
 
 let openCh=null;
+let currentTab='home';
+let selectedGlossaryTerm='';
+let glossaryReturnState=null;
 function toggleChapter(id){
 const panel=document.getElementById('drill-panel');
 const card=document.getElementById('card-'+id);
@@ -623,7 +657,7 @@ openCh=id;card.classList.add('open');
 const ch=chapters[id-1];
 const flowHTML=ch.flow.map((s,i)=>`<span class="flow-node" style="color:${ch.accent};border-color:${ch.accent}60;background:${ch.accent}10">${s}</span>${i<ch.flow.length-1?'<span class="flow-arrow">&#8594;</span>':''}`).join('');
 const conceptsHTML=ch.concepts.map(c=>`<div class="concept-card"><div class="concept-title"><span class="concept-dot" style="background:${ch.accent}"></span>${c.t}</div><div class="concept-desc">${c.d}</div></div>`).join('');
-const termsHTML=ch.terms.map(t=>`<span class="term-chip">${t}</span>`).join('');
+const termsHTML=ch.terms.map(t=>`<button type="button" class="term-chip" onclick="openGlossaryTerm('${escapeAttr(t)}',${ch.id})">${t}</button>`).join('');
 panel.innerHTML=`<div class="drill-header"><div class="drill-header-left"><h2 style="color:${ch.accent}">Ch ${ch.id} &#8212; ${ch.title}</h2><p>${ch.summary}</p></div><button class="close-btn" onclick="toggleChapter(${ch.id})">&#10005; close</button></div>
 <div class="flow-diagram"><div class="flow-label">Signal / Data Flow</div><div class="flow-row">${flowHTML}</div>${ch.flowNote?`<div class="flow-sub">${ch.flowNote}</div>`:''}</div>
 <div class="diagram-container"><div class="diagram-title">Architecture Diagram</div>${getDiagram(ch.diagram,ch.accent)}</div>
@@ -671,18 +705,81 @@ document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')
 btn.classList.add('active');renderQuiz(f);
 }
 
+function normalizeTerm(term){
+return term.toLowerCase().replace(/\([^)]*\)/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function findGlossaryTerm(term){
+const wanted=normalizeTerm(term);
+return glossaryTerms.find(g=>normalizeTerm(g.t)===wanted)
+||glossaryTerms.find(g=>normalizeTerm(g.t).split(' ').includes(wanted))
+||glossaryTerms.find(g=>wanted.split(' ').includes(normalizeTerm(g.t)))
+||glossaryTerms.find(g=>normalizeTerm(g.t).includes(wanted)||wanted.includes(normalizeTerm(g.t)));
+}
+
+function escapeAttr(value){
+return String(value).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
 function renderGlossary(filter=''){
 const f=filter.toLowerCase();
 const filtered=f?glossaryTerms.filter(g=>g.t.toLowerCase().includes(f)||g.d.toLowerCase().includes(f)):glossaryTerms;
-document.getElementById('gloss-grid').innerHTML=filtered.map(g=>`<div class="gloss-card"><div class="gloss-term">${g.t}</div><div class="gloss-def">${g.d}</div><div class="gloss-ch">${g.ch}</div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;padding:16px">No terms found.</div>';
+document.getElementById('gloss-grid').innerHTML=filtered.map(g=>{
+const selected=selectedGlossaryTerm&&normalizeTerm(g.t)===normalizeTerm(selectedGlossaryTerm);
+return `<div class="gloss-card ${selected?'highlight':''}" id="gloss-${normalizeTerm(g.t).replace(/\s+/g,'-')}"><div class="gloss-term">${g.t}</div><div class="gloss-def">${g.d}</div><div class="gloss-ch">${g.ch}</div></div>`;
+}).join('')||'<div style="color:var(--muted);font-size:13px;padding:16px">No terms found.</div>';
+document.getElementById('gloss-back').classList.toggle('visible',!!glossaryReturnState);
 }
 
-function filterGlossary(val){renderGlossary(val);}
+function filterGlossary(val){
+selectedGlossaryTerm='';
+renderGlossary(val);
+}
 
-function switchTab(tab){
+function openGlossaryTerm(term,chapterId){
+const match=findGlossaryTerm(term);
+selectedGlossaryTerm=match?.t||term;
+glossaryReturnState={tab:currentTab,chapterId,scrollY:window.scrollY};
+const search=document.getElementById('gloss-search');
+search.value=match?.t||term;
+switchTab('glossary',{preserveGlossary:true});
+renderGlossary(search.value);
+setTimeout(()=>{
+const target=document.querySelector('.gloss-card.highlight')||document.querySelector('.gloss-card');
+target?.scrollIntoView({behavior:'smooth',block:'center'});
+},80);
+}
+
+function returnFromGlossary(){
+const state=glossaryReturnState;
+glossaryReturnState=null;
+selectedGlossaryTerm='';
+document.getElementById('gloss-search').value='';
+renderGlossary();
+if(!state){switchTab('map');return;}
+switchTab(state.tab,{skipScroll:true});
+if(state.tab==='map'&&state.chapterId){
+setTimeout(()=>{
+if(openCh!==state.chapterId)toggleChapter(state.chapterId);
+document.getElementById('drill-panel')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+},80);
+}else{
+setTimeout(()=>window.scrollTo({top:state.scrollY||0,behavior:'smooth'}),60);
+}
+}
+
+function switchTab(tab,opts={}){
+currentTab=tab;
+if(tab!=='glossary'&&!opts.preserveGlossary){
+glossaryReturnState=null;
+selectedGlossaryTerm='';
+const search=document.getElementById('gloss-search');
+if(search)search.value='';
+}
 document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['home','map','quiz','glossary'][i]===tab);});
 ['home','map','quiz','glossary'].forEach(s=>{document.getElementById(s+'-section').style.display=s===tab?'block':'none';});
-window.scrollTo({top:0,behavior:'smooth'});
+if(tab==='glossary')renderGlossary(document.getElementById('gloss-search')?.value||'');
+if(!opts.skipScroll)window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function goToChapter(id){
