@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Networks — Interactive Learning Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#f4f6fb;
+--bg2:#ffffff;
+--bg3:#eef1f8;
+--bg4:#e4e9f4;
+--border:#d0d7e8;
+--border2:#b0bcda;
+--text:#1a2140;
+--muted:#5a6480;
+--faint:#8892aa;
+--a1:#2563eb;
+--a2:#7c3aed;
+--a3:#059669;
+--a4:#ea580c;
+--a5:#db2777;
+--a6:#d97706;
+--mono:'Space Mono',monospace;
+--sans:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;height:52px;box-shadow:0 1px 8px rgba(37,99,235,0.06)}
+.nav-logo{font-family:var(--mono);font-size:12px;color:var(--a1);letter-spacing:.08em;margin-right:auto;text-transform:uppercase;font-weight:700}
+.nav-tabs{display:flex;gap:0}
+.nav-tab{font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 16px;height:52px;display:flex;align-items:center;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--a1);border-bottom-color:var(--a1)}
+
+.hero{padding:110px 2rem 56px;max-width:900px;margin:0 auto}
+.hero-label{font-family:var(--mono);font-size:11px;color:var(--a3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;font-weight:700}
+.hero-label::before{content:'';width:24px;height:2px;background:var(--a3);border-radius:1px}
+.hero h1{font-family:var(--mono);font-size:clamp(26px,5vw,50px);font-weight:700;line-height:1.15;color:var(--text);margin-bottom:20px}
+.hero h1 span{color:var(--a1)}
+.hero p{color:var(--muted);font-size:16px;max-width:560px;margin-bottom:36px}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat-num{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--a1)}
+.stat-label{font-size:12px;color:var(--muted)}
+
+.section{padding:48px 1.5rem 64px;max-width:1100px;margin:0 auto}
+.section-title{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:24px;display:flex;align-items:center;gap:10px;font-weight:700}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:20px}
+.ch-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .15s;position:relative;overflow:hidden}
+.ch-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--a1));opacity:0;transition:opacity .2s;border-radius:14px 14px 0 0}
+.ch-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(37,99,235,0.09);transform:translateY(-2px)}
+.ch-card:hover::before,.ch-card.open::before{opacity:1}
+.ch-card.open{background:var(--bg3);border-color:var(--card-accent,var(--a1));box-shadow:0 2px 12px rgba(37,99,235,0.08)}
+.ch-num{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em;margin-bottom:8px;text-transform:uppercase}
+.ch-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.ch-sub{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.ch-tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px;border:1.5px solid;font-weight:700}
+
+.drill-panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:16px;padding:28px;margin-top:8px;display:none;animation:slidedown .25s ease;box-shadow:0 4px 24px rgba(37,99,235,0.07)}
+.drill-panel.visible{display:block}
+@keyframes slidedown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.drill-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:16px}
+.drill-header-left h2{font-size:18px;font-weight:600;color:var(--text);margin-bottom:6px}
+.drill-header-left p{font-size:13px;color:var(--muted);max-width:600px;line-height:1.6}
+.close-btn{font-family:var(--mono);font-size:11px;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;font-weight:700}
+.close-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg3)}
+
+.flow-diagram{margin-bottom:20px;background:var(--bg3);border-radius:12px;padding:18px;overflow-x:auto;border:1px solid var(--border)}
+.flow-label{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;font-weight:700}
+.flow-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:max-content}
+.flow-node{font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:7px;border:1.5px solid;white-space:nowrap;font-weight:700}
+.flow-arrow{font-size:14px;color:var(--faint);flex-shrink:0}
+.flow-sub{font-size:11px;color:var(--muted);margin-top:10px;font-style:italic}
+
+.concepts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:18px}
+.concept-card{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px;transition:border-color .2s,box-shadow .2s}
+.concept-card:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(37,99,235,0.06)}
+.concept-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.concept-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.concept-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.terms-row{display:flex;flex-wrap:wrap;gap:7px}
+.term-chip{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:20px;background:var(--bg3);border:1.5px solid var(--border);color:var(--muted);font-weight:700}
+
+.diagram-container{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:20px;overflow-x:auto;margin-top:16px}
+.diagram-title{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;font-weight:700}
+
+.quiz-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.quiz-filter{display:flex;gap:7px;flex-wrap:wrap}
+.filter-btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all .2s;font-weight:700}
+.filter-btn:hover{border-color:var(--border2);color:var(--text)}
+.filter-btn.active{background:var(--a1);border-color:var(--a1);color:#fff}
+
+.quiz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.quiz-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.quiz-ch-tag{font-family:var(--mono);font-size:10px;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:6px;font-weight:700;text-transform:uppercase}
+.quiz-q{font-size:14px;font-weight:500;color:var(--text);margin-bottom:14px;line-height:1.55}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{font-size:13px;padding:9px 13px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:9px;font-family:var(--sans)}
+.quiz-opt:hover:not([disabled]){border-color:var(--a1);color:var(--text);background:var(--bg3)}
+.quiz-opt.correct{border-color:#059669;background:#ecfdf5;color:#065f46}
+.quiz-opt.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.opt-label{font-family:var(--mono);font-size:10px;font-weight:700;min-width:18px;flex-shrink:0;color:var(--a1)}
+.quiz-opt.correct .opt-label{color:#059669}
+.quiz-opt.wrong .opt-label{color:#dc2626}
+.quiz-explanation{margin-top:10px;padding:11px 13px;background:var(--bg3);border-radius:9px;border:1.5px solid var(--border);font-size:12px;color:var(--muted);display:none;line-height:1.65}
+.quiz-explanation.visible{display:block}
+
+.quiz-score-bar{margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.score-track{flex:1;height:5px;background:var(--bg4);border-radius:5px;overflow:hidden}
+.score-fill{height:100%;background:var(--a3);border-radius:5px;transition:width .5s ease;width:0%}
+.score-text{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;font-weight:700}
+
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.gloss-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;transition:box-shadow .2s}
+.gloss-card:hover{box-shadow:0 2px 8px rgba(37,99,235,0.07)}
+.gloss-term{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--a1);margin-bottom:6px}
+.gloss-def{font-size:12px;color:var(--muted);line-height:1.65}
+.gloss-ch{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px;font-weight:700}
+.gloss-search{width:100%;max-width:380px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:10px 15px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:20px}
+.gloss-search:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.gloss-search::placeholder{color:var(--faint)}
+
+.path-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;transition:border-color .2s,box-shadow .2s,transform .15s;cursor:pointer}.path-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(37,99,235,0.09);transform:translateY(-2px)}
+.path-card:hover::before{opacity:1}
+.info-bar{margin-top:28px;padding:20px 24px;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">// MobileNets</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('home')">Overview</div>
+    <div class="nav-tab" onclick="switchTab('map')">Concept Map</div>
+    <div class="nav-tab" onclick="switchTab('quiz')">Quiz</div>
+    <div class="nav-tab" onclick="switchTab('glossary')">Glossary</div>
+  </div>
+</nav>
+
+<div id="home-section">
+  <div class="hero">
+    <div class="hero-label">Intern Training Guide</div>
+    <h1>Mobile Network<br><span>Architecture</span> &amp;<br>Data Transport</h1>
+    <p>From analog 1G to cloud-native 5G — explore how voice calls, data packets, and video streams actually travel through a mobile network.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">7</span><span class="stat-label">Chapters</span></div>
+      <div class="stat"><span class="stat-num">42</span><span class="stat-label">Concepts</span></div>
+      <div class="stat"><span class="stat-num">28</span><span class="stat-label">Quiz questions</span></div>
+      <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Glossary terms</span></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Learning Path</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      <div class="ch-card path-card" style="--card-accent:#2563eb;cursor:pointer" onclick="goToChapter(1)"><div class="ch-num">CH 01</div><div class="ch-title">Evolution 1G&#8594;5G</div><div class="ch-sub">Generational leaps and what changed</div></div>
+      <div class="ch-card path-card" style="--card-accent:#059669;cursor:pointer" onclick="goToChapter(2)"><div class="ch-num">CH 02</div><div class="ch-title">Network Anatomy</div><div class="ch-sub">RAN, Core, EPC, 5GC structures</div></div>
+      <div class="ch-card path-card" style="--card-accent:#7c3aed;cursor:pointer" onclick="goToChapter(3)"><div class="ch-num">CH 03</div><div class="ch-title">Protocol Stack</div><div class="ch-sub">GTP, SDAP, PDCP, RLC, MAC, PHY</div></div>
+      <div class="ch-card path-card" style="--card-accent:#ea580c;cursor:pointer" onclick="goToChapter(4)"><div class="ch-num">CH 04</div><div class="ch-title">Voice Routing</div><div class="ch-sub">Circuits &#8594; VoLTE &#8594; VoNR</div></div>
+      <div class="ch-card path-card" style="--card-accent:#d97706;cursor:pointer" onclick="goToChapter(5)"><div class="ch-num">CH 05</div><div class="ch-title">Data &amp; Streaming</div><div class="ch-sub">4K YouTube on 5G end-to-end</div></div>
+      <div class="ch-card path-card" style="--card-accent:#059669;cursor:pointer" onclick="goToChapter(6)"><div class="ch-num">CH 06</div><div class="ch-title">QoS &amp; Slicing</div><div class="ch-sub">Priority, QCI, 5QI, slices</div></div>
+      <div class="ch-card path-card" style="--card-accent:#db2777;cursor:pointer" onclick="goToChapter(7)"><div class="ch-num">CH 07</div><div class="ch-title">Mobility &amp; Handover</div><div class="ch-sub">Switching towers at highway speed</div></div>
+    </div>
+    <div class="info-bar">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Recommended path</div>
+      <div style="font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="color:var(--a1);font-weight:600">Concept Map</span><span>&#8594; Explore all 7 chapters with deep diagrams</span>
+        <span style="color:var(--border2)">|</span>
+        <span style="color:var(--a2);font-weight:600">Quiz</span><span>&#8594; Test knowledge per chapter</span>
+        <span style="color:var(--border2)">|</span>
+        <span style="color:var(--a3);font-weight:600">Glossary</span><span>&#8594; Search any term instantly</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="map-section" style="display:none">
+  <div class="section">
+    <div class="section-title">Concept Map &#8212; All 7 Chapters</div>
+    <div class="chapter-grid" id="chapter-grid"></div>
+    <div id="drill-panel" class="drill-panel"></div>
+  </div>
+</div>
+
+<div id="quiz-section" style="display:none">
+  <div class="section">
+    <div class="quiz-header-row">
+      <div class="section-title" style="margin-bottom:0;flex:1">Quiz &#8212; 28 Questions</div>
+      <div class="quiz-filter">
+        <button class="filter-btn active" onclick="filterQuiz('all',this)">All</button>
+        <button class="filter-btn" onclick="filterQuiz(1,this)">Ch 1</button>
+        <button class="filter-btn" onclick="filterQuiz(2,this)">Ch 2</button>
+        <button class="filter-btn" onclick="filterQuiz(3,this)">Ch 3</button>
+        <button class="filter-btn" onclick="filterQuiz(4,this)">Ch 4</button>
+        <button class="filter-btn" onclick="filterQuiz(5,this)">Ch 5</button>
+        <button class="filter-btn" onclick="filterQuiz(6,this)">Ch 6</button>
+        <button class="filter-btn" onclick="filterQuiz(7,this)">Ch 7</button>
+      </div>
+    </div>
+    <div class="quiz-score-bar" style="margin-top:18px">
+      <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+      <div class="score-text" id="score-text">0 correct / 0 answered</div>
+    </div>
+    <div class="quiz-grid" id="quiz-grid"></div>
+  </div>
+</div>
+
+<div id="glossary-section" style="display:none">
+  <div class="section">
+    <div class="section-title">Glossary &#8212; 50+ Key Terms</div>
+    <input type="text" class="gloss-search" placeholder="Search terms&#8230; e.g. VoLTE, GTP, eNodeB, DASH" oninput="filterGlossary(this.value)">
+    <div class="gloss-grid" id="gloss-grid"></div>
+  </div>
+</div>
+
+<script>
+const CA=['#2563eb','#059669','#7c3aed','#ea580c','#d97706','#059669','#db2777'];
+const chapters=[
+{id:1,title:'Evolution of Mobile Networks',sub:'1G to 5G generational leaps',accent:'#2563eb',tag:'Foundations',
+summary:'Each generation solved the previous one\'s biggest bottleneck — from analog noise (1G) to digital security (2G), mobile broadband (3G), all-IP architecture (4G), and cloud-native service-based design (5G).',
+concepts:[
+{t:'1G — Analog Voice',d:'First generation. Purely analog, voice-only. No encryption, no data. Susceptible to eavesdropping.'},
+{t:'2G — GSM / Digital',d:'Digital signals + multiplexing. Enabled secure voice, SMS, GPRS mobile data, and introduced the SIM card standard.'},
+{t:'3G — UMTS / HSPA',d:'Shifted focus to mobile broadband. WCDMA air interface. Video calls possible. Peak ~42 Mbps via HSPA+.'},
+{t:'4G — LTE',d:'All-IP packet-switched overhaul. Abandoned analog circuits. Flattened architecture cut latency. Speeds to 1 Gbps.'},
+{t:'5G — New Radio (NR)',d:'Cloud-native service-based architecture. Massive MIMO + beamforming. 1-10 ms latency. IoT and autonomous vehicle scale.'},
+{t:'GPRS',d:'General Packet Radio Service. 2G data overlay providing the first always-on mobile internet at 56-114 kbps.'},
+],
+flow:['1G Analog','2G Digital (GSM)','3G Broadband (UMTS)','4G All-IP (LTE)','5G Cloud-Native (NR)'],
+flowNote:'Each G is a structural overhaul — not just a speed bump.',
+terms:['1G','2G','3G','4G','5G','GSM','LTE','UMTS','HSPA','WCDMA','NR','GPRS','Massive MIMO','Beamforming'],
+diagram:'evolution'},
+{id:2,title:'Anatomy of a Mobile Network',sub:'RAN + Core Network domains',accent:'#059669',tag:'Architecture',
+summary:'Every mobile network splits into two primary domains: the Radio Access Network (RAN) — the physical towers — and the Core Network — the routing brain that connects everything to the internet.',
+concepts:[
+{t:'RAN — Radio Access Network',d:'Physical towers and antennas. Called BTS (2G) → NodeB (3G) → eNodeB (4G) → gNodeB/gNB (5G).'},
+{t:'UE — User Equipment',d:'The mobile device (phone, tablet, IoT sensor). Initiates all connections to the RAN.'},
+{t:'Legacy Core (2G/3G)',d:'Dual-domain split: Circuit Switched (MSC for voice) and Packet Switched (SGSN + GGSN for data).'},
+{t:'EPC — Evolved Packet Core (4G)',d:'Merged CS and PS into all-IP. MME tracks users, S-GW anchors mobility, P-GW connects to internet.'},
+{t:'5GC — 5G Core',d:'Fully virtualized on cloud servers. Control plane (AMF, SMF) separated from User Plane (UPF). Service-Based Architecture.'},
+{t:'AMF — Access and Mobility Function',d:'5G equivalent of MME. Handles UE registration, authentication, and mobility management.'},
+],
+flow:['UE (Phone)','RAN (gNB/eNB)','Core Network','Internet / PSTN'],
+flowNote:'RAN handles radio. Core handles routing and authentication.',
+terms:['RAN','UE','BTS','NodeB','eNodeB','gNodeB','MSC','SGSN','GGSN','EPC','MME','S-GW','P-GW','5GC','AMF','SMF','UPF','SBA'],
+diagram:'anatomy'},
+{id:3,title:'Protocol Stack',sub:'How data is packaged layer by layer',accent:'#7c3aed',tag:'Protocols',
+summary:'Data travels down this stack from app to radio waves — each layer adds a specific job: tunneling, prioritization, compression, scheduling, and transmission.',
+concepts:[
+{t:'GTP — GPRS Tunnelling Protocol',d:'Wraps user IP packets so traffic can be rerouted between towers as you move without breaking the connection.'},
+{t:'SDAP — Service Data Adaptation Protocol',d:'5G only. Tags every packet with a 5QI QoS identifier to ensure high-priority traffic goes first.'},
+{t:'PDCP — Packet Data Convergence Protocol',d:'Compresses IP headers from 40 bytes to 2-4 bytes. Also encrypts all user data for security.'},
+{t:'RLC — Radio Link Control',d:'Chops data into smaller blocks. Provides rapid error correction via retransmissions if packets are lost.'},
+{t:'MAC — Medium Access Control',d:'Schedules data for radio transmission slots and manages spectrum sharing between multiple users.'},
+{t:'PHY — Physical Layer',d:'The lowest layer. Converts digital bits into actual radio waves using OFDM modulation.'},
+],
+flow:['App Data','GTP (tunnel)','SDAP (tag)','PDCP (compress+encrypt)','RLC/MAC (schedule)','PHY to Radio'],
+flowNote:'Top-down on transmit, bottom-up on receive.',
+terms:['GTP','SDAP','PDCP','RLC','MAC','PHY','OFDM','QoS','5QI','IP Header Compression','Packet'],
+diagram:'stack'},
+{id:4,title:'Voice Call Routing',sub:'Circuits to VoLTE to VoNR',accent:'#ea580c',tag:'Voice',
+summary:'Voice went from dedicated physical circuits in 2G/3G (wasteful but simple) to pure IP packets in 4G/5G. CSFB and SRVCC bridge the gap for networks in transition.',
+concepts:[
+{t:'Circuit Switched (2G/3G)',d:'MSC dedicates a physical circuit for the entire call duration. Reliable but wasteful — bandwidth reserved even during silence.'},
+{t:'VoLTE — Voice over LTE',d:'Treats voice as IP packets via IMS. HD voice quality, faster call setup (~2s vs ~8s on circuit).'},
+{t:'IMS — IP Multimedia Subsystem',d:'SIP-based signaling infrastructure behind VoLTE. Handles call setup, routing, and quality management.'},
+{t:'CSFB — Circuit Switched Fallback',d:'If 4G coverage is weak, phone drops to 3G/2G for voice call via legacy circuits. Adds 1-3s delay.'},
+{t:'SRVCC — Single Radio Voice Call Continuity',d:'Translates a live VoLTE packet call into a circuit-switched call mid-handover (4G to 3G). No drop.'},
+{t:'VoNR — Voice over New Radio',d:'5G native voice. Purely packet-switched in the 5G cloud core. No circuit fallback needed.'},
+],
+flow:['2G/3G Circuit','4G VoLTE (IMS)','CSFB if weak signal','SRVCC if moving to 3G','5G VoNR'],
+flowNote:'VoLTE requires IMS. Many operators still rely on CSFB today.',
+terms:['Circuit Switched','Packet Switched','VoLTE','VoNR','IMS','CSFB','SRVCC','MSC','SIP','HD Voice'],
+diagram:'voice'},
+{id:5,title:'Data Transfer & Video Streaming',sub:'4K YouTube on 5G end to end',accent:'#d97706',tag:'Data Flow',
+summary:'A 4K YouTube request on 5G never reaches the public internet in an MEC deployment. It hits a Google edge cache inside the operator data center, cutting latency to just 5-20 ms.',
+concepts:[
+{t:'HTTP/3 + QUIC',d:'Modern transport. Runs over UDP, not TCP. Eliminates head-of-line blocking for faster video start and better performance on lossy links.'},
+{t:'GTP Tunnel',d:'gNodeB encapsulates the HTTP/3 request in GTP and tunnels it to the UPF in the 5G Core.'},
+{t:'MEC — Multi-access Edge Computing',d:'Servers placed at the network edge inside operator data centers. Enables local content delivery without an internet hop.'},
+{t:'UPF as ULCL',d:'UPF acts as Uplink Classifier — inspects traffic and routes YouTube requests to a local MEC edge cache.'},
+{t:'Google Global Cache',d:'Google CDN server deployed inside telecom operator data centers. Serves YouTube without traversing the public internet.'},
+{t:'DASH — Dynamic Adaptive Streaming',d:'Video split into 2-second segments at multiple quality levels. Player auto-adjusts resolution (4K to 1080p) to match bandwidth.'},
+],
+flow:['Phone click','HTTP/3 + QUIC','5G gNB','GTP tunnel','UPF (ULCL)','MEC Edge Cache','DASH player'],
+flowNote:'MEC local breakout is the key to 5-20 ms latency instead of 80-120 ms.',
+terms:['HTTP/3','QUIC','GTP','UPF','MEC','ULCL','DASH','CDN','ABR','Google Global Cache','Latency'],
+diagram:'streaming'},
+{id:6,title:'QoS & Network Slicing',sub:'Priority, QCI, 5QI, network slices',accent:'#059669',tag:'Quality',
+summary:'QoS prevents your neighbour\'s download from buffering your video call. 5G takes it further with per-flow prioritization (5QI) and network slicing — isolated virtual networks on shared hardware.',
+concepts:[
+{t:'QCI — QoS Class Identifier (4G)',d:'Assigned per bearer (whole connection). QCI 1 = real-time voice; QCI 6/8/9 = video. Coarse-grained.'},
+{t:'5QI — 5G QoS Identifier',d:'Applied per individual packet flow by SDAP. Finer than 4G QCI — separate flows in one connection can have different priorities.'},
+{t:'Network Slicing',d:'Creates isolated virtual networks on shared 5G hardware. Each slice gets dedicated bandwidth, latency, and reliability guarantees.'},
+{t:'eMBB Slice',d:'Enhanced Mobile Broadband. High-throughput slice for video, VR, and large downloads. Prioritizes speed.'},
+{t:'URLLC Slice',d:'Ultra-Reliable Low Latency. For autonomous vehicles and industrial robotics. Targets under 1ms latency at 99.9999% reliability.'},
+{t:'mMTC Slice',d:'Massive Machine Type Communications. For billions of IoT sensors sending tiny packets infrequently.'},
+],
+flow:['Traffic arrives','SDAP tags 5QI','UPF enforces policy','Slice routes independently','User gets guaranteed QoS'],
+flowNote:'Network slicing is to 5G what virtual machines are to servers.',
+terms:['QoS','QCI','5QI','Bearer','Flow','Network Slicing','eMBB','URLLC','mMTC','SDAP','SLA','Bandwidth'],
+diagram:'qos'},
+{id:7,title:'Mobility & Handover',sub:'Switching towers at highway speed',accent:'#db2777',tag:'Mobility',
+summary:'Handover is the art of switching towers without dropping a call. Each generation improves — from 100ms hard breaks in 4G to dual connectivity and beam tracking in 5G for true zero-interruption handover.',
+concepts:[
+{t:'Hard Handover (4G)',d:'Break-before-make. Phone disconnects from old eNodeB before connecting to new one. Creates ~50-100 ms invisible gap.'},
+{t:'SRVCC (4G to 2G/3G)',d:'When coverage drops from 4G to legacy, SRVCC converts the VoLTE call to circuit-switched mid-flight. No drop.'},
+{t:'Measurement Reports',d:'UE continuously measures signal quality from neighboring towers and reports to serving eNB/gNB to trigger handover.'},
+{t:'Dual Connectivity (5G)',d:'Phone maintains simultaneous connections to both 4G and 5G during handover. True 0ms interruption.'},
+{t:'Beam Management (5G)',d:'5G tracks users at beam level, not just cell level. Beams steer toward you — handover can happen within one cell.'},
+{t:'X2 / Xn Interface',d:'Direct base station-to-base station link (X2 in 4G, Xn in 5G) enabling fast coordinated handover without the core.'},
+],
+flow:['Old tower serving','UE measurement reports','Threshold crossed','Target tower selected','X2/Xn handover prep','New tower active','Call continues'],
+flowNote:'Voice calls are real-time and stateful — zero tolerance for dropped frames.',
+terms:['Handover','SRVCC','CSFB','Dual Connectivity','Beam Management','X2 Interface','Xn Interface','Measurement Report','Break-Before-Make'],
+diagram:'handover'},
+];
+
+function getDiagram(type,ac){
+const lt='#1a2140',mt='#5a6480',fa='#8892aa',bg2='#ffffff',bg3='#eef1f8',bd='#d0d7e8';
+const d={
+evolution:`<svg width="100%" viewBox="0 0 680 200" role="img"><title>Mobile network evolution timeline</title>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="${fa}" stroke-width="1.5"/></marker></defs>
+<line x1="40" y1="100" x2="640" y2="100" stroke="${bd}" stroke-width="2"/>
+<circle cx="60" cy="100" r="24" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><text x="60" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#64748b" font-family="Space Mono">1G</text><text x="60" y="109" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Space Mono">'84</text><text x="60" y="150" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Analog</text><text x="60" y="164" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Voice</text>
+<circle cx="200" cy="100" r="24" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="200" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#2563eb" font-family="Space Mono">2G</text><text x="200" y="109" text-anchor="middle" font-size="9" fill="#93c5fd" font-family="Space Mono">'91</text><text x="200" y="50" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Digital</text><text x="200" y="64" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">GSM</text>
+<circle cx="340" cy="100" r="24" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="340" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed" font-family="Space Mono">3G</text><text x="340" y="109" text-anchor="middle" font-size="9" fill="#c4b5fd" font-family="Space Mono">'01</text><text x="340" y="150" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Mobile</text><text x="340" y="164" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Broadband</text>
+<circle cx="480" cy="100" r="24" fill="#f0fdf4" stroke="#059669" stroke-width="1.5"/><text x="480" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#059669" font-family="Space Mono">4G</text><text x="480" y="109" text-anchor="middle" font-size="9" fill="#6ee7b7" font-family="Space Mono">'09</text><text x="480" y="50" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">All-IP</text><text x="480" y="64" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">LTE</text>
+<circle cx="620" cy="100" r="24" fill="${ac}10" stroke="${ac}" stroke-width="2"/><text x="620" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="${ac}" font-family="Space Mono">5G</text><text x="620" y="109" text-anchor="middle" font-size="9" fill="${ac}80" font-family="Space Mono">'19</text><text x="620" y="150" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Cloud</text><text x="620" y="164" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Native</text>
+<line x1="84" y1="100" x2="174" y2="100" stroke="${bd}" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="224" y1="100" x2="314" y2="100" stroke="${bd}" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="364" y1="100" x2="454" y2="100" stroke="${bd}" stroke-width="1.5" marker-end="url(#ar)"/>
+<line x1="504" y1="100" x2="594" y2="100" stroke="${ac}" stroke-width="1.5" marker-end="url(#ar)"/>
+</svg>`,
+
+anatomy:`<svg width="100%" viewBox="0 0 680 260" role="img"><title>Mobile network anatomy</title>
+<defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="${fa}" stroke-width="1.5"/></marker></defs>
+<rect x="20" y="90" width="108" height="80" rx="10" fill="${ac}0d" stroke="${ac}" stroke-width="1.5"/>
+<text x="74" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="${ac}" font-family="DM Sans">UE</text>
+<text x="74" y="144" text-anchor="middle" font-size="10" fill="${mt}" font-family="DM Sans">User Device</text>
+<rect x="166" y="58" width="148" height="144" rx="10" fill="#f0fdf410" stroke="#059669" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="240" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#059669" font-family="DM Sans">RAN</text>
+<rect x="182" y="94" width="116" height="38" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1"/>
+<text x="240" y="117" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">gNB / eNB</text>
+<rect x="182" y="144" width="116" height="38" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1"/>
+<text x="240" y="167" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Antenna Array</text>
+<rect x="356" y="38" width="210" height="184" rx="10" fill="${ac}08" stroke="${ac}" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="461" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="${ac}" font-family="DM Sans">Core Network</text>
+<rect x="372" y="76" width="178" height="36" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1"/>
+<text x="461" y="91" text-anchor="middle" font-size="11" font-weight="700" fill="${ac}" font-family="DM Sans">AMF / MME</text>
+<text x="461" y="105" text-anchor="middle" font-size="10" fill="${mt}" font-family="DM Sans">Mobility Mgmt</text>
+<rect x="372" y="122" width="178" height="36" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1"/>
+<text x="461" y="137" text-anchor="middle" font-size="11" font-weight="700" fill="${ac}" font-family="DM Sans">UPF / P-GW</text>
+<text x="461" y="151" text-anchor="middle" font-size="10" fill="${mt}" font-family="DM Sans">User Plane</text>
+<rect x="372" y="168" width="178" height="36" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1"/>
+<text x="461" y="183" text-anchor="middle" font-size="11" font-weight="700" fill="${ac}" font-family="DM Sans">SMF / S-GW</text>
+<text x="461" y="197" text-anchor="middle" font-size="10" fill="${mt}" font-family="DM Sans">Session Mgmt</text>
+<rect x="600" y="100" width="66" height="60" rx="10" fill="${bg3}" stroke="${bd}" stroke-width="1"/>
+<text x="633" y="133" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Internet</text>
+<line x1="128" y1="130" x2="164" y2="130" stroke="${fa}" stroke-width="1.5" marker-end="url(#ar2)"/>
+<line x1="314" y1="130" x2="354" y2="130" stroke="${fa}" stroke-width="1.5" marker-end="url(#ar2)"/>
+<line x1="566" y1="130" x2="598" y2="130" stroke="${fa}" stroke-width="1.5" marker-end="url(#ar2)"/>
+<text x="146" y="122" text-anchor="middle" font-size="9" fill="${fa}" font-family="DM Sans">Radio</text>
+<text x="334" y="122" text-anchor="middle" font-size="9" fill="${fa}" font-family="DM Sans">GTP</text>
+<text x="580" y="122" text-anchor="middle" font-size="9" fill="${fa}" font-family="DM Sans">IP</text>
+</svg>`,
+
+stack:`<svg width="100%" viewBox="0 0 680 320" role="img"><title>Protocol stack</title>
+<rect x="100" y="10" width="480" height="46" rx="8" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="196" y="29" font-size="13" font-weight="700" fill="${ac}" font-family="DM Sans">Application</text>
+<text x="196" y="46" font-size="11" fill="${mt}" font-family="DM Sans">HTTP/3 / QUIC / UDP</text>
+<text x="566" y="37" text-anchor="end" font-size="10" fill="${ac}80" font-family="Space Mono">App layer</text>
+<rect x="100" y="66" width="480" height="46" rx="8" fill="#2563eb10" stroke="#2563eb" stroke-width="1.5"/>
+<text x="196" y="85" font-size="13" font-weight="700" fill="#2563eb" font-family="DM Sans">GTP</text>
+<text x="196" y="102" font-size="11" fill="${mt}" font-family="DM Sans">GPRS Tunnelling Protocol</text>
+<text x="566" y="93" text-anchor="end" font-size="10" fill="#2563eb80" font-family="Space Mono">Network</text>
+<rect x="100" y="122" width="480" height="46" rx="8" fill="#7c3aed10" stroke="#7c3aed" stroke-width="1.5"/>
+<text x="196" y="141" font-size="13" font-weight="700" fill="#7c3aed" font-family="DM Sans">SDAP</text>
+<text x="196" y="158" font-size="11" fill="${mt}" font-family="DM Sans">QoS flow tagging — 5G only</text>
+<text x="566" y="149" text-anchor="end" font-size="10" fill="#7c3aed80" font-family="Space Mono">Radio-5G</text>
+<rect x="100" y="178" width="480" height="46" rx="8" fill="#ea580c10" stroke="#ea580c" stroke-width="1.5"/>
+<text x="196" y="197" font-size="13" font-weight="700" fill="#ea580c" font-family="DM Sans">PDCP</text>
+<text x="196" y="214" font-size="11" fill="${mt}" font-family="DM Sans">Compress headers + Encrypt</text>
+<text x="566" y="205" text-anchor="end" font-size="10" fill="#ea580c80" font-family="Space Mono">Radio</text>
+<rect x="100" y="234" width="480" height="46" rx="8" fill="#05966910" stroke="#059669" stroke-width="1.5"/>
+<text x="196" y="253" font-size="13" font-weight="700" fill="#059669" font-family="DM Sans">RLC / MAC</text>
+<text x="196" y="270" font-size="11" fill="${mt}" font-family="DM Sans">Schedule + Error-correct</text>
+<text x="566" y="261" text-anchor="end" font-size="10" fill="#05966980" font-family="Space Mono">Radio</text>
+<rect x="100" y="290" width="480" height="24" rx="8" fill="#db277710" stroke="#db2777" stroke-width="1.5"/>
+<text x="196" y="307" font-size="12" font-weight="700" fill="#db2777" font-family="DM Sans">PHY — Physical Layer (OFDM radio waves)</text>
+<text x="74" y="172" text-anchor="middle" font-size="10" fill="${fa}" font-family="Space Mono" transform="rotate(-90,74,172)">TX down / RX up</text>
+<line x1="86" y1="18" x2="86" y2="306" stroke="${bd}" stroke-width="2"/>
+</svg>`,
+
+voice:`<svg width="100%" viewBox="0 0 680 230" role="img"><title>Voice call routing</title>
+<defs><marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="${fa}" stroke-width="1.5"/></marker></defs>
+<rect x="14" y="55" width="118" height="90" rx="10" fill="#f8fafc" stroke="${bd}" stroke-width="1.5"/>
+<text x="73" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b" font-family="Space Mono">2G/3G</text>
+<text x="73" y="108" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans">Circuit</text>
+<text x="73" y="124" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="DM Sans">Switched</text>
+<text x="73" y="168" text-anchor="middle" font-size="10" fill="${fa}" font-family="DM Sans">MSC to PSTN</text>
+<rect x="176" y="55" width="138" height="90" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+<text x="245" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#2563eb" font-family="Space Mono">4G VoLTE</text>
+<text x="245" y="108" text-anchor="middle" font-size="11" fill="#3b82f6" font-family="DM Sans">Packet</text>
+<text x="245" y="124" text-anchor="middle" font-size="11" fill="#3b82f6" font-family="DM Sans">Switched</text>
+<text x="245" y="168" text-anchor="middle" font-size="10" fill="${fa}" font-family="DM Sans">IMS to Internet</text>
+<rect x="368" y="55" width="118" height="90" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="427" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#ea580c" font-family="Space Mono">CSFB</text>
+<text x="427" y="108" text-anchor="middle" font-size="11" fill="#f97316" font-family="DM Sans">Fallback</text>
+<text x="427" y="124" text-anchor="middle" font-size="11" fill="#f97316" font-family="DM Sans">4G to 3G/2G</text>
+<text x="427" y="168" text-anchor="middle" font-size="10" fill="${fa}" font-family="DM Sans">if signal weak</text>
+<rect x="540" y="55" width="130" height="90" rx="10" fill="${ac}10" stroke="${ac}" stroke-width="2"/>
+<text x="605" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="${ac}" font-family="Space Mono">5G VoNR</text>
+<text x="605" y="108" text-anchor="middle" font-size="11" fill="${ac}" font-family="DM Sans">Packet</text>
+<text x="605" y="124" text-anchor="middle" font-size="11" fill="${ac}" font-family="DM Sans">Cloud</text>
+<text x="605" y="168" text-anchor="middle" font-size="10" fill="${fa}" font-family="DM Sans">5GC to Internet</text>
+<line x1="132" y1="100" x2="174" y2="100" stroke="${fa}" stroke-width="1.5" marker-end="url(#ar3)"/>
+<line x1="314" y1="100" x2="366" y2="100" stroke="#ea580c80" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar3)"/>
+<line x1="486" y1="100" x2="538" y2="100" stroke="${ac}" stroke-width="1.5" marker-end="url(#ar3)"/>
+</svg>`,
+
+streaming:`<svg width="100%" viewBox="0 0 680 285" role="img"><title>4K video streaming flow</title>
+<defs><marker id="ar4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="${ac}" stroke-width="1.5"/></marker></defs>
+<rect x="8" y="88" width="92" height="70" rx="10" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="54" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="${ac}" font-family="DM Sans">Phone</text>
+<text x="54" y="136" text-anchor="middle" font-size="11" fill="${ac}bb" font-family="DM Sans">(UE)</text>
+<rect x="128" y="88" width="92" height="70" rx="10" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="174" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="${ac}" font-family="DM Sans">5G gNB</text>
+<text x="174" y="136" text-anchor="middle" font-size="10" fill="${ac}bb" font-family="DM Sans">Tower</text>
+<rect x="248" y="88" width="100" height="70" rx="10" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="298" y="116" text-anchor="middle" font-size="12" font-weight="700" fill="${ac}" font-family="DM Sans">UPF</text>
+<text x="298" y="132" text-anchor="middle" font-size="10" fill="${ac}bb" font-family="DM Sans">(ULCL)</text>
+<text x="298" y="148" text-anchor="middle" font-size="10" fill="${ac}bb" font-family="DM Sans">Classifier</text>
+<rect x="382" y="66" width="116" height="114" rx="10" fill="${ac}20" stroke="${ac}" stroke-width="2"/>
+<text x="440" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="${ac}" font-family="DM Sans">MEC</text>
+<text x="440" y="128" text-anchor="middle" font-size="10" fill="${ac}" font-family="DM Sans">Edge Cache</text>
+<text x="440" y="144" text-anchor="middle" font-size="10" fill="${ac}" font-family="DM Sans">Google Cache</text>
+<text x="440" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="${ac}" font-family="DM Sans">Local breakout!</text>
+<rect x="530" y="88" width="136" height="70" rx="10" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="598" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="${ac}" font-family="DM Sans">DASH Player</text>
+<text x="598" y="136" text-anchor="middle" font-size="10" fill="${ac}bb" font-family="DM Sans">Adaptive quality</text>
+<line x1="100" y1="123" x2="126" y2="123" stroke="${ac}" stroke-width="1.5" marker-end="url(#ar4)"/>
+<line x1="220" y1="123" x2="246" y2="123" stroke="${ac}" stroke-width="1.5" marker-end="url(#ar4)"/>
+<line x1="348" y1="123" x2="380" y2="123" stroke="${ac}" stroke-width="2" marker-end="url(#ar4)"/>
+<line x1="498" y1="123" x2="528" y2="123" stroke="${ac}" stroke-width="1.5" marker-end="url(#ar4)"/>
+<text x="113" y="80" text-anchor="middle" font-size="9" fill="${fa}" font-family="DM Sans">HTTP/3+QUIC</text>
+<text x="233" y="80" text-anchor="middle" font-size="9" fill="${fa}" font-family="DM Sans">GTP tunnel</text>
+<text x="364" y="56" text-anchor="middle" font-size="9" fill="${ac}" font-family="DM Sans">local route</text>
+<text x="513" y="80" text-anchor="middle" font-size="9" fill="${fa}" font-family="DM Sans">DASH segs</text>
+<rect x="382" y="220" width="284" height="48" rx="10" fill="${bg2}" stroke="${ac}40" stroke-width="1.5"/>
+<text x="524" y="241" text-anchor="middle" font-size="13" font-weight="700" fill="${ac}" font-family="Space Mono">5-20 ms latency</text>
+<text x="524" y="258" text-anchor="middle" font-size="10" fill="${mt}" font-family="DM Sans">vs 80-120 ms via public internet</text>
+</svg>`,
+
+qos:`<svg width="100%" viewBox="0 0 680 255" role="img"><title>QoS and network slicing</title>
+<rect x="18" y="36" width="292" height="192" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="164" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#2563eb" font-family="DM Sans">4G — QCI Bearer-Level</text>
+<rect x="36" y="74" width="256" height="36" rx="8" fill="${bg2}" stroke="#2563eb40" stroke-width="1"/>
+<text x="62" y="96" font-size="12" font-weight="700" fill="#2563eb" font-family="Space Mono">QCI 1</text>
+<text x="160" y="96" font-size="11" fill="${mt}" font-family="DM Sans">VoIP real-time</text>
+<rect x="36" y="120" width="256" height="36" rx="8" fill="${bg2}" stroke="#2563eb40" stroke-width="1"/>
+<text x="62" y="142" font-size="12" font-weight="700" fill="#2563eb" font-family="Space Mono">QCI 6</text>
+<text x="160" y="142" font-size="11" fill="${mt}" font-family="DM Sans">Video streaming</text>
+<rect x="36" y="166" width="256" height="36" rx="8" fill="${bg3}" stroke="${bd}" stroke-width="1"/>
+<text x="62" y="188" font-size="12" font-weight="700" fill="${fa}" font-family="Space Mono">QCI 9</text>
+<text x="160" y="188" font-size="11" fill="${mt}" font-family="DM Sans">Background data</text>
+<rect x="358" y="36" width="306" height="192" rx="12" fill="${ac}08" stroke="${ac}" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="511" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="${ac}" font-family="DM Sans">5G — Network Slicing</text>
+<rect x="374" y="74" width="274" height="36" rx="8" fill="#f0fdf4" stroke="#05966940" stroke-width="1"/>
+<text x="398" y="96" font-size="12" font-weight="700" fill="#059669" font-family="Space Mono">eMBB</text>
+<text x="496" y="96" font-size="11" fill="${mt}" font-family="DM Sans">Video / VR / Speed</text>
+<rect x="374" y="120" width="274" height="36" rx="8" fill="${ac}10" stroke="${ac}40" stroke-width="1"/>
+<text x="398" y="142" font-size="12" font-weight="700" fill="${ac}" font-family="Space Mono">URLLC</text>
+<text x="496" y="142" font-size="11" fill="${mt}" font-family="DM Sans">Autonomous / Industrial</text>
+<rect x="374" y="166" width="274" height="36" rx="8" fill="#f5f3ff" stroke="#7c3aed40" stroke-width="1"/>
+<text x="398" y="188" font-size="12" font-weight="700" fill="#7c3aed" font-family="Space Mono">mMTC</text>
+<text x="496" y="188" font-size="11" fill="${mt}" font-family="DM Sans">IoT / Sensors</text>
+<text x="340" y="136" text-anchor="middle" font-size="16" fill="${fa}">&#8594;</text>
+</svg>`,
+
+handover:`<svg width="100%" viewBox="0 0 680 255" role="img"><title>Handover process</title>
+<defs><marker id="ar5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="${fa}" stroke-width="1.5"/></marker></defs>
+<rect x="10" y="46" width="116" height="154" rx="12" fill="#f0fdf4" stroke="#059669" stroke-width="1.5"/>
+<text x="68" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#059669" font-family="DM Sans">Tower A</text>
+<text x="68" y="114" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Strong</text>
+<text x="68" y="130" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">signal</text>
+<text x="68" y="168" text-anchor="middle" font-size="10" font-weight="700" fill="#059669" font-family="Space Mono">serving</text>
+<rect x="554" y="46" width="116" height="154" rx="12" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="612" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="${ac}" font-family="DM Sans">Tower B</text>
+<text x="612" y="114" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Strong</text>
+<text x="612" y="130" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">signal</text>
+<text x="612" y="168" text-anchor="middle" font-size="10" font-weight="700" fill="${ac}" font-family="Space Mono">target</text>
+<rect x="148" y="76" width="74" height="38" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1.5"/>
+<text x="185" y="99" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Measure</text>
+<rect x="242" y="76" width="74" height="38" rx="8" fill="${bg2}" stroke="${bd}" stroke-width="1.5"/>
+<text x="279" y="99" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">Report</text>
+<rect x="336" y="76" width="74" height="38" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+<text x="373" y="99" text-anchor="middle" font-size="11" fill="#ea580c" font-family="DM Sans">Decide</text>
+<rect x="430" y="76" width="84" height="38" rx="8" fill="${ac}10" stroke="${ac}" stroke-width="1.5"/>
+<text x="472" y="99" text-anchor="middle" font-size="11" fill="${ac}" font-family="DM Sans">Execute</text>
+<line x1="126" y1="95" x2="146" y2="95" stroke="${fa}" stroke-width="1.5" marker-end="url(#ar5)"/>
+<line x1="222" y1="95" x2="240" y2="95" stroke="${fa}" stroke-width="1" marker-end="url(#ar5)"/>
+<line x1="316" y1="95" x2="334" y2="95" stroke="${fa}" stroke-width="1" marker-end="url(#ar5)"/>
+<line x1="410" y1="95" x2="428" y2="95" stroke="#ea580c" stroke-width="1" marker-end="url(#ar5)"/>
+<line x1="514" y1="95" x2="552" y2="95" stroke="${ac}" stroke-width="1.5" marker-end="url(#ar5)"/>
+<rect x="148" y="162" width="186" height="32" rx="8" fill="${bg3}" stroke="${bd}" stroke-width="1"/>
+<text x="241" y="182" text-anchor="middle" font-size="11" fill="${mt}" font-family="DM Sans">4G: 50-100ms gap</text>
+<rect x="346" y="162" width="192" height="32" rx="8" fill="${ac}10" stroke="${ac}60" stroke-width="1"/>
+<text x="442" y="182" text-anchor="middle" font-size="11" font-weight="600" fill="${ac}" font-family="DM Sans">5G: 0ms dual connect</text>
+</svg>`
+};
+return d[type]||'';
+}
+
+const quizData=[
+{ch:1,q:'What did 2G (GSM) introduce over 1G?',opts:['Higher voice quality only','Digital signals, SIM cards, and SMS/GPRS data','Video calling capability','All-IP packet switching'],ans:1,exp:'2G digitized the voice signal and introduced multiplexing, the SIM card standard, SMS, and GPRS for basic mobile data — a huge leap from analog 1G.'},
+{ch:1,q:'What does LTE stand for?',opts:['Long Term Evolution','Low Transmission Efficiency','Linked Telephone Exchange','Layered Transfer Encoding'],ans:0,exp:'LTE = Long Term Evolution. It is the 4G standard that made networks fully all-IP and packet-switched, abandoning circuit-switching entirely.'},
+{ch:1,q:'What air interface does 3G UMTS use?',opts:['OFDM','WCDMA — Wideband CDMA','TDMA','GSM radio'],ans:1,exp:'3G uses WCDMA (Wideband Code Division Multiple Access) as its radio air interface, enabling mobile broadband up to ~42 Mbps.'},
+{ch:1,q:'What is Massive MIMO in 5G?',opts:['A video compression algorithm','Many antenna elements serving multiple users simultaneously via beamforming','A type of core network node','The 4G modulation scheme'],ans:1,exp:'Massive MIMO uses large arrays of antennas at base stations to serve multiple users simultaneously using beamforming — a key 5G enabler.'},
+{ch:2,q:'What is the 5G equivalent of the 4G eNodeB?',opts:['BTS','NodeB','gNodeB (gNB)','SGSN'],ans:2,exp:'The radio base station is called BTS (2G) → NodeB (3G) → eNodeB (4G) → gNodeB or gNB (5G).'},
+{ch:2,q:'In the 4G EPC, what does the MME do?',opts:['Routes user data to internet','Tracks user location and handles authentication','Connects to PSTN for voice','Manages physical antennas'],ans:1,exp:'The MME (Mobility Management Entity) tracks which cell a UE is in, handles authentication, and manages idle/active state transitions.'},
+{ch:2,q:'What does SBA stand for in 5G Core?',opts:['Subscriber Broadband Access','Service-Based Architecture','Signal Beam Allocation','Secure Bearer Assignment'],ans:1,exp:'5G Core uses Service-Based Architecture (SBA) — each network function exposes HTTP/2 APIs and communicates via a common service bus, like microservices.'},
+{ch:2,q:'Which 4G EPC element connects users to the public internet?',opts:['MME','S-GW','P-GW — PDN Gateway','SGSN'],ans:2,exp:'The P-GW (PDN Gateway) is the 4G internet-facing anchor. In 5G, this role is taken by the UPF (User Plane Function).'},
+{ch:3,q:'Why does GTP exist in mobile networks?',opts:['To encrypt all voice calls','To tunnel user IP so traffic reroutes between towers during handover','To compress video streams','To assign QoS priorities'],ans:1,exp:'Standard IP cannot move between locations. GTP wraps user packets in a tunnel so the core can seamlessly reroute traffic from one tower to another as the user moves.'},
+{ch:3,q:'What does PDCP primarily do?',opts:['Schedules radio slots','Assigns QoS IDs','Compresses IP headers and encrypts data','Converts bits to radio waves'],ans:2,exp:'PDCP (Packet Data Convergence Protocol) compresses IP headers from 40 bytes to 2-4 bytes (saving radio bandwidth) and encrypts user data.'},
+{ch:3,q:'Which 5G layer tags packets with QoS identifiers?',opts:['RLC','PDCP','SDAP','PHY'],ans:2,exp:'SDAP (Service Data Adaptation Protocol) is new in 5G. It maps each packet to a 5QI QoS flow so high-priority traffic gets transmitted first.'},
+{ch:3,q:'What does the PHY layer do?',opts:['Compresses headers','Tags packets with priority','Converts digital bits to radio waves','Manages handover decisions'],ans:2,exp:'The Physical (PHY) layer is the lowest layer — it converts digital data bits into actual radio waves using modulation schemes like OFDM.'},
+{ch:4,q:'Why was CSFB needed in 4G?',opts:['4G is too slow for voice','4G has no circuit-switched domain — weak coverage forces drop to 3G/2G for voice','4G cannot handle SIP','Voice consumes too much LTE bandwidth'],ans:1,exp:'4G LTE is all-IP with no circuit-switched domain. When coverage is weak, the phone must fall back to 3G/2G where legacy circuits handle voice.'},
+{ch:4,q:'What infrastructure powers VoLTE?',opts:['PSTN','IMS — IP Multimedia Subsystem','5GC AMF','Circuit MSC'],ans:1,exp:'VoLTE uses the IMS (IP Multimedia Subsystem) which handles SIP-based call setup, routing, and quality management over the packet-switched network.'},
+{ch:4,q:'What does SRVCC do?',opts:['Increases voice bitrate','Translates VoLTE call to circuit-switched during 4G to 3G handover','Provides voice encryption','Manages beam selection for voice'],ans:1,exp:'SRVCC (Single Radio Voice Call Continuity) ensures a live VoLTE call survives handover from 4G to a legacy 3G/2G network without being dropped.'},
+{ch:4,q:'How is voice handled in 5G NR?',opts:['Circuit-switched via MSC','CSFB to 4G for all voice','VoNR — fully packet-switched in the 5G core','A separate dedicated voice network'],ans:2,exp:'5G uses VoNR (Voice over New Radio), keeping voice entirely as data packets within the 5G cloud core. No fallback or circuits needed.'},
+{ch:5,q:'What transport protocol does 5G video streaming typically use?',opts:['TCP/IP','HTTP/2 over TLS','HTTP/3 over QUIC (UDP)','FTP'],ans:2,exp:'Modern 5G streaming uses HTTP/3 over QUIC, which runs on UDP. QUIC eliminates TCP head-of-line blocking for faster start times on lossy links.'},
+{ch:5,q:'What role does the UPF play in 5G MEC streaming?',opts:['It runs the YouTube server','It acts as ULCL — Uplink Classifier — to intercept and locally route cached requests','It manages beam selection','It encrypts the video stream'],ans:1,exp:'The UPF acts as a ULCL (Uplink Classifier), inspecting traffic and routing YouTube requests to a local MEC edge cache instead of the public internet.'},
+{ch:5,q:'What does DASH solve for video streaming?',opts:['Reduces antenna interference','Adjusts video quality automatically to match network conditions','Manages MEC routing','Distributes content via CDN only'],ans:1,exp:'DASH (Dynamic Adaptive Streaming over HTTP) breaks video into short segments at multiple quality levels. The player selects the best resolution in real-time based on bandwidth.'},
+{ch:5,q:'What is the typical latency benefit of MEC?',opts:['No difference','5-20 ms vs 80-120 ms via public internet','50% faster for video only','MEC only benefits voice calls'],ans:1,exp:'With MEC, a Google Global Cache server sits inside the operator data center. Round-trip is 5-20 ms vs 80-120 ms if routed through the public internet.'},
+{ch:6,q:'Key difference between 4G QCI and 5G 5QI?',opts:['QCI uses numbers, 5QI uses letters','QCI is per-bearer (whole connection); 5QI is per-flow (individual packets)','5QI is only for voice','They are identical, just renamed'],ans:1,exp:'4G QCI assigns priority at the bearer level — one priority for the entire connection. 5G 5QI goes to the flow level, so streams within one connection can have different priorities.'},
+{ch:6,q:'Which 5G slice is used for autonomous vehicle control?',opts:['eMBB','mMTC','URLLC — Ultra-Reliable Low Latency','No separate slices for vehicles'],ans:2,exp:'URLLC (Ultra-Reliable Low Latency Communications) targets under 1ms latency at 99.9999% reliability — designed for autonomous vehicles and factory robots.'},
+{ch:6,q:'Best analogy for 5G Network Slicing?',opts:['Adding more physical towers','Like virtual machines on a server — isolated environments on shared hardware','Increasing transmission power','Similar to 4G carrier aggregation'],ans:1,exp:'Network slicing is precisely like virtualization in computing — multiple isolated virtual networks run on the same physical 5G infrastructure, each with guaranteed resources.'},
+{ch:6,q:'Which layer enforces 5G QoS flow priorities on the radio interface?',opts:['PHY','PDCP','SDAP','RLC'],ans:2,exp:'SDAP (Service Data Adaptation Protocol) maps each packet to a 5QI-tagged QoS flow and ensures the radio scheduler treats high-priority traffic first.'},
+{ch:7,q:'What is break-before-make handover and which generation uses it?',opts:['5G uses it for reliability','4G LTE primarily — disconnect old tower before connecting to new one','2G only','It refers to beam switching only'],ans:1,exp:'4G LTE primarily uses hard (break-before-make) handover: the phone disconnects from the old eNodeB before connecting to the new one, ~50-100 ms interruption.'},
+{ch:7,q:'How does 5G achieve near-zero interruption during handover?',opts:['It avoids handover using one giant cell','Dual connectivity — simultaneous 4G and 5G connections during the switch','Using circuit voice as backup','Increasing power at cell edge'],ans:1,exp:'5G uses dual connectivity (EN-DC) — during handover, the UE maintains simultaneous radio connections to both old and new base stations, eliminating any gap.'},
+{ch:7,q:'What is the X2/Xn interface used for?',opts:['Connecting core to internet','Direct base station-to-base station link for fast coordinated handover without the core','Connecting UE to the RAN','Backhaul to data center'],ans:1,exp:'X2 (4G) and Xn (5G) are direct inter-base-station interfaces. They allow fast handover coordination — the source can pre-prepare the target without involving the core network.'},
+{ch:7,q:'What triggers a handover decision?',opts:['User manually selecting a tower','UE measurement reports showing a neighbor has stronger signal','MME detecting low battery','IMS session timer expiring'],ans:1,exp:'The UE continuously measures signal quality (RSRP/RSRQ) from neighboring base stations and sends Measurement Reports to the serving eNB/gNB. A strong neighbor triggers handover.'},
+];
+
+const glossaryTerms=[
+{t:'1G',d:'First Generation — analog, voice-only. No data, no encryption.',ch:'Ch 1'},
+{t:'2G / GSM',d:'Second Generation — digital mobile network. Introduced SMS, SIM cards, and GPRS mobile data.',ch:'Ch 1'},
+{t:'3G / UMTS',d:'Third Generation — mobile broadband using WCDMA. Enabled video calls and up to 42 Mbps.',ch:'Ch 1'},
+{t:'4G / LTE',d:'Long Term Evolution — all-IP packet-switched network. Up to 1 Gbps, no circuit-switching.',ch:'Ch 1'},
+{t:'5G / NR',d:'New Radio — cloud-native service-based architecture. 1-10 ms latency, Massive MIMO.',ch:'Ch 1'},
+{t:'Massive MIMO',d:'Multiple-Input Multiple-Output with large antenna arrays. Serves many users simultaneously via beamforming.',ch:'Ch 1'},
+{t:'Beamforming',d:'Directing radio energy in targeted beams toward specific users instead of broadcasting omnidirectionally.',ch:'Ch 1'},
+{t:'GPRS',d:'General Packet Radio Service — 2G data overlay. First always-on mobile internet, 56-114 kbps.',ch:'Ch 1'},
+{t:'WCDMA',d:'Wideband CDMA — 3G radio air interface. Enables simultaneous voice and data on the same carrier.',ch:'Ch 1'},
+{t:'RAN',d:'Radio Access Network — physical towers and antennas connecting mobile devices to the core network.',ch:'Ch 2'},
+{t:'UE',d:'User Equipment — any mobile device (phone, tablet, IoT sensor) that connects to the network.',ch:'Ch 2'},
+{t:'BTS',d:'Base Transceiver Station — 2G radio tower. The physical antenna and radio hardware.',ch:'Ch 2'},
+{t:'eNodeB',d:'Evolved Node B — the 4G LTE base station. Predecessor: NodeB (3G), BTS (2G).',ch:'Ch 2'},
+{t:'gNodeB (gNB)',d:'Next Generation Node B — the 5G NR base station. Handles both sub-6 GHz and mmWave.',ch:'Ch 2'},
+{t:'EPC',d:'Evolved Packet Core — the 4G all-IP core. Contains MME, S-GW, and P-GW.',ch:'Ch 2'},
+{t:'MME',d:'Mobility Management Entity — 4G core node. Tracks UE location, handles authentication and session setup.',ch:'Ch 2'},
+{t:'S-GW',d:'Serving Gateway — 4G core node. Anchors user mobility and buffers downlink data during handover.',ch:'Ch 2'},
+{t:'P-GW',d:'PDN Gateway — 4G internet-facing gateway. Assigns UE IP addresses and connects to internet.',ch:'Ch 2'},
+{t:'5GC',d:'5G Core — cloud-native, virtualized core network using service-based architecture.',ch:'Ch 2'},
+{t:'AMF',d:'Access and Mobility Function — 5G equivalent of MME. Registration, auth, mobility management.',ch:'Ch 2'},
+{t:'SMF',d:'Session Management Function — 5G node managing PDU sessions, UE IPs, and QoS.',ch:'Ch 2'},
+{t:'UPF',d:'User Plane Function — 5G traffic routing engine. Forwards user data and can act as ULCL for MEC.',ch:'Ch 2'},
+{t:'SBA',d:'Service-Based Architecture — 5G core design where functions expose HTTP/2 APIs to each other.',ch:'Ch 2'},
+{t:'GTP',d:'GPRS Tunnelling Protocol — tunnels user IP packets so mobility does not break connections.',ch:'Ch 3'},
+{t:'SDAP',d:'Service Data Adaptation Protocol — 5G layer tagging packets with 5QI QoS identifiers.',ch:'Ch 3'},
+{t:'PDCP',d:'Packet Data Convergence Protocol — compresses IP headers and encrypts user data.',ch:'Ch 3'},
+{t:'RLC',d:'Radio Link Control — segments data and handles retransmissions for error correction.',ch:'Ch 3'},
+{t:'MAC',d:'Medium Access Control — schedules radio transmission slots and manages spectrum sharing.',ch:'Ch 3'},
+{t:'PHY',d:'Physical Layer — converts bits to radio waves using OFDM modulation.',ch:'Ch 3'},
+{t:'OFDM',d:'Orthogonal Frequency Division Multiplexing — multi-carrier modulation scheme used in 4G and 5G.',ch:'Ch 3'},
+{t:'VoLTE',d:'Voice over LTE — voice transmitted as IP packets via IMS over the 4G network. HD quality.',ch:'Ch 4'},
+{t:'VoNR',d:'Voice over New Radio — 5G native voice, fully packet-switched in the 5G core.',ch:'Ch 4'},
+{t:'IMS',d:'IP Multimedia Subsystem — SIP-based signaling infrastructure powering VoLTE call setup and routing.',ch:'Ch 4'},
+{t:'CSFB',d:'Circuit Switched Fallback — forces 4G phone to drop to 3G/2G for voice when 4G signal is weak.',ch:'Ch 4'},
+{t:'SRVCC',d:'Single Radio Voice Call Continuity — translates VoLTE call to circuit-switched during 4G to 3G handover.',ch:'Ch 4'},
+{t:'MSC',d:'Mobile Switching Center — 2G/3G core node routing circuit-switched voice calls.',ch:'Ch 4'},
+{t:'HTTP/3',d:'Third version of HTTP, running over QUIC/UDP. Eliminates head-of-line blocking.',ch:'Ch 5'},
+{t:'QUIC',d:'Quick UDP Internet Connections — transport protocol replacing TCP for low-latency web traffic.',ch:'Ch 5'},
+{t:'MEC',d:'Multi-access Edge Computing — servers at the network edge enabling local content delivery.',ch:'Ch 5'},
+{t:'ULCL',d:'Uplink Classifier — UPF role that inspects and routes traffic locally to an edge server.',ch:'Ch 5'},
+{t:'DASH',d:'Dynamic Adaptive Streaming over HTTP — video quality auto-adjusts to available bandwidth.',ch:'Ch 5'},
+{t:'QCI',d:'QoS Class Identifier — 4G quality priority assigned per bearer. 1 = voice, 6/8/9 = data.',ch:'Ch 6'},
+{t:'5QI',d:'5G QoS Identifier — per-flow quality identifier mapped by SDAP. Finer than 4G QCI.',ch:'Ch 6'},
+{t:'Network Slicing',d:'Isolated virtual networks on shared 5G hardware — like VMs for the network.',ch:'Ch 6'},
+{t:'eMBB',d:'Enhanced Mobile Broadband — 5G slice for high-throughput: video, VR, large downloads.',ch:'Ch 6'},
+{t:'URLLC',d:'Ultra-Reliable Low Latency — 5G slice for under 1ms latency: autonomous vehicles, robotics.',ch:'Ch 6'},
+{t:'mMTC',d:'Massive Machine Type Comms — 5G slice for billions of IoT sensors with small infrequent packets.',ch:'Ch 6'},
+{t:'Handover',d:'Switching a mobile connection from one base station to another without service interruption.',ch:'Ch 7'},
+{t:'Dual Connectivity',d:'5G technique maintaining simultaneous 4G and 5G connections during handover for zero interruption.',ch:'Ch 7'},
+{t:'X2 Interface',d:'Direct 4G eNodeB-to-eNodeB link for coordinated handover without the core network.',ch:'Ch 7'},
+{t:'Xn Interface',d:'Direct 5G gNB-to-gNB link — 5G equivalent of X2 for fast coordinated handover.',ch:'Ch 7'},
+{t:'Measurement Report',d:'UE signal quality reports sent to the serving base station to trigger handover decisions.',ch:'Ch 7'},
+];
+
+function renderChapterCards(){
+document.getElementById('chapter-grid').innerHTML=chapters.map(ch=>`
+<div class="ch-card" style="--card-accent:${ch.accent}" id="card-${ch.id}" onclick="toggleChapter(${ch.id})">
+<div class="ch-num">CH 0${ch.id}</div>
+<div class="ch-title">${ch.title}</div>
+<div class="ch-sub">${ch.sub}</div>
+<span class="ch-tag" style="color:${ch.accent};border-color:${ch.accent}50;background:${ch.accent}10">${ch.tag}</span>
+</div>`).join('');
+}
+
+let openCh=null;
+function toggleChapter(id){
+const panel=document.getElementById('drill-panel');
+const card=document.getElementById('card-'+id);
+if(openCh===id){panel.classList.remove('visible');card.classList.remove('open');openCh=null;return;}
+if(openCh)document.getElementById('card-'+openCh)?.classList.remove('open');
+openCh=id;card.classList.add('open');
+const ch=chapters[id-1];
+const flowHTML=ch.flow.map((s,i)=>`<span class="flow-node" style="color:${ch.accent};border-color:${ch.accent}60;background:${ch.accent}10">${s}</span>${i<ch.flow.length-1?'<span class="flow-arrow">&#8594;</span>':''}`).join('');
+const conceptsHTML=ch.concepts.map(c=>`<div class="concept-card"><div class="concept-title"><span class="concept-dot" style="background:${ch.accent}"></span>${c.t}</div><div class="concept-desc">${c.d}</div></div>`).join('');
+const termsHTML=ch.terms.map(t=>`<span class="term-chip">${t}</span>`).join('');
+panel.innerHTML=`<div class="drill-header"><div class="drill-header-left"><h2 style="color:${ch.accent}">Ch ${ch.id} &#8212; ${ch.title}</h2><p>${ch.summary}</p></div><button class="close-btn" onclick="toggleChapter(${ch.id})">&#10005; close</button></div>
+<div class="flow-diagram"><div class="flow-label">Signal / Data Flow</div><div class="flow-row">${flowHTML}</div>${ch.flowNote?`<div class="flow-sub">${ch.flowNote}</div>`:''}</div>
+<div class="diagram-container"><div class="diagram-title">Architecture Diagram</div>${getDiagram(ch.diagram,ch.accent)}</div>
+<div style="margin-top:16px"><div class="flow-label" style="margin-bottom:12px">Key Concepts</div><div class="concepts-grid">${conceptsHTML}</div></div>
+<div style="margin-top:12px"><div class="flow-label" style="margin-bottom:10px">Key Terms</div><div class="terms-row">${termsHTML}</div></div>`;
+panel.classList.add('visible');
+setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+let quizState={};
+function renderQuiz(filter='all'){
+const filtered=filter==='all'?quizData:quizData.filter(q=>q.ch==filter);
+document.getElementById('quiz-grid').innerHTML=filtered.map(q=>{
+const gi=quizData.indexOf(q);
+const st=quizState[gi]||{};
+const optsHTML=q.opts.map((o,oi)=>{
+let cls='';
+if(st.answered){cls=oi===q.ans?'correct':(oi===st.chosen?'wrong':'');}
+return `<button class="quiz-opt ${cls}" onclick="answerQ(${gi},${oi})" ${st.answered?'disabled':''}><span class="opt-label">${['A','B','C','D'][oi]}</span>${o}</button>`;
+}).join('');
+return `<div class="quiz-card"><div class="quiz-ch-tag"><span style="width:6px;height:6px;border-radius:50%;background:${CA[q.ch-1]};display:inline-block"></span>Chapter ${q.ch}</div><div class="quiz-q">${q.q}</div><div class="quiz-options" id="qopts-${gi}">${optsHTML}</div><div class="quiz-explanation ${st.answered?'visible':''}" id="qexp-${gi}">${q.exp}</div></div>`;
+}).join('');
+updateScore();
+}
+
+function answerQ(idx,chosen){
+if(quizState[idx]?.answered)return;
+quizState[idx]={answered:true,chosen,correct:chosen===quizData[idx].ans};
+const q=quizData[idx];
+const opts=document.querySelectorAll('#qopts-'+idx+' .quiz-opt');
+opts.forEach((o,oi)=>{if(oi===q.ans)o.classList.add('correct');else if(oi===chosen)o.classList.add('wrong');o.disabled=true;});
+document.getElementById('qexp-'+idx).classList.add('visible');
+updateScore();
+}
+
+function updateScore(){
+const answered=Object.values(quizState).filter(s=>s.answered).length;
+const correct=Object.values(quizState).filter(s=>s.correct).length;
+document.getElementById('score-text').textContent=`${correct} correct / ${answered} answered`;
+document.getElementById('score-fill').style.width=answered>0?(correct/answered*100)+'%':'0%';
+}
+
+function filterQuiz(f,btn){
+document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');renderQuiz(f);
+}
+
+function renderGlossary(filter=''){
+const f=filter.toLowerCase();
+const filtered=f?glossaryTerms.filter(g=>g.t.toLowerCase().includes(f)||g.d.toLowerCase().includes(f)):glossaryTerms;
+document.getElementById('gloss-grid').innerHTML=filtered.map(g=>`<div class="gloss-card"><div class="gloss-term">${g.t}</div><div class="gloss-def">${g.d}</div><div class="gloss-ch">${g.ch}</div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;padding:16px">No terms found.</div>';
+}
+
+function filterGlossary(val){renderGlossary(val);}
+
+function switchTab(tab){
+document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['home','map','quiz','glossary'][i]===tab);});
+['home','map','quiz','glossary'].forEach(s=>{document.getElementById(s+'-section').style.display=s===tab?'block':'none';});
+window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goToChapter(id){
+switchTab('map');
+// Wait for map section to render, then open chapter
+setTimeout(()=>{ toggleChapter(id); },80);
+}
+renderChapterCards();renderQuiz();renderGlossary();
+</script>
+</body>
+</html>
