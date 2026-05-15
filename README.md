@@ -60,8 +60,15 @@ Open `index.html` in any browser — no server, no dependencies, works fully off
 ```
 LearnMobileNetworking/
 ├── index.html      # Complete single-page app
-└── README.md       # This file
+├── README.md       # This file
+└── CONTRIBUTING.md # Contribution and PR policy
 ```
+
+---
+
+## 🤝 Contributing
+
+Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request.
 
 ---
 
